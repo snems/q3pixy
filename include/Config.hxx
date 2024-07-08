@@ -24,6 +24,11 @@ namespace Q3Pixy::Config
     const std::chrono::time_point<std::chrono::system_clock> last_event;
   };
 
+  struct Config
+  {
+    std::vector<Server> servers;
+  };
+
   class Manager
   {
     public:
@@ -34,10 +39,10 @@ namespace Q3Pixy::Config
       Manager& operator=(const Manager&&) = delete;
       virtual ~Manager() = default;
       std::pair<bool, std::string> load_config(const std::string& path);
-      std::vector<Server> get_config();
-      void dump_config();
+      const Config& get_config() const;
+      void dump_config() const;
     private:
-      std::vector<Server> config;
+      Config config;
   };
 }
 #endif

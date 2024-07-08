@@ -14,7 +14,7 @@ namespace Q3Pixy::Config
       Json::CharReaderBuilder builder;
       JSONCPP_STRING errs;
 
-      config.clear();
+      config = Config{};
 
       if (!ifs.is_open())
       {
@@ -112,20 +112,20 @@ namespace Q3Pixy::Config
         {
           server.local_to_client_multiplier = 1;
         }
-        config.push_back(server);
+        config.servers.push_back(server);
       }
 
       return std::make_pair(true, "Okey");
     }
 
-    std::vector<Server> Manager::get_config(){ return config; }
+    const Config& Manager::get_config() const{ return config; }
 
-    void Manager::dump_config()
+    void Manager::dump_config() const
     {
       char str[INET_ADDRSTRLEN];
       std::stringstream out;
       int cnt = 0;
-      for (const auto &a: config)
+      for (const auto &a: config.servers)
       {
         out << "Entry " << ++cnt << ":" << std::endl;
         inet_ntop(AF_INET, &(a.server_ip.sin_addr), str, INET_ADDRSTRLEN);
