@@ -1,0 +1,26 @@
+{
+  "Q3Pixy" : {
+    "Servers" : [
+      {
+        "server_ip" : "92.38.139.65",
+        "server_port" : 7700,
+        "local_ip" : "0.0.0.0",
+        "local_port" : 7700,
+        "local_to_server_multiplier" : 1,
+        "local_to_client_multiplier" : 4
+      },
+      {
+        "server_ip" : "92.38.139.65",
+        "server_port" : 27965,
+        "local_to_server_multiplier" : 1,
+        "local_to_client_multiplier" : 4
+      },
+      {
+        "server_ip" : "92.38.139.65",
+        "server_port" : 27977,
+        "local_to_server_multiplier" : 1,
+        "local_to_client_multiplier" : 4
+      }
+    ]
+  }
+}
