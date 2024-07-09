@@ -1,4 +1,5 @@
 #include "include/Config.hxx"
+#include "include/Connections.hxx"
 #include <cstdlib>
 #include <iostream>
 #include <tuple>
@@ -9,6 +10,7 @@ main(void)
   bool load_config_success;
   std::string load_config_message;
   Q3Pixy::Config::Manager config_manager;
+  Q3Pixy::Connections::Manager conn_manager;
   // load config
   std::tie(load_config_success, load_config_message) = config_manager.load_config("./q3pixy.json");
 
@@ -18,11 +20,20 @@ main(void)
     return EXIT_FAILURE;
   }
 
+
+
   std::cout << "Config loaded" << std::endl;
   config_manager.dump_config();
 
+  conn_manager.init(config_manager.get_config());
+
 
   // start routines
+
+  while(conn_manager.routine())
+  {
+
+  }
 
   return EXIT_SUCCESS;
 }

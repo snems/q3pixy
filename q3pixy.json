@@ -18,6 +18,7 @@
       {
         "server_ip" : "92.38.139.65",
         "server_port" : 27977,
+        "local_ip" : "0.0.0.0",
         "local_to_server_multiplier" : 1,
         "local_to_client_multiplier" : 4
       }

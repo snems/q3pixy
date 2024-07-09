@@ -3,6 +3,7 @@
 #include <jsoncpp/json/json.h>
 #include <fstream>
 #include <sstream>
+#include <sys/socket.h>
 #include <variant>
 
 namespace Q3Pixy::Config
@@ -66,33 +67,36 @@ namespace Q3Pixy::Config
         }
         // Read server config
         Q3Pixy::Config::Server server{};
-        if (inet_pton(AF_INET, val["server_ip"].asString().c_str(), &(server.server_ip.sin_addr)) != 1)
+        server.server.sin_family = AF_INET;
+        server.local.sin_family = AF_INET;
+
+        if (inet_pton(AF_INET, val["server_ip"].asString().c_str(), &(server.server.sin_addr)) != 1)
         {
           return std::make_pair(false, "couldn't parse server ip address");
         }
-        server.server_port = val["server_port"].asInt();
+        server.server.sin_port = htons(val["server_port"].asInt());
 
         // Read local ip or set it to zero
         if (val.isMember("local_ip"))
         {
-          if (inet_pton(AF_INET, val["local_ip"].asString().c_str(), &(server.local_ip.sin_addr)) != 1)
+          if (inet_pton(AF_INET, val["local_ip"].asString().c_str(), &(server.local.sin_addr)) != 1)
           {
             return std::make_pair(false, "couldn't parse local ip address");
           }
         }
         else
         {
-          std::memset(&server.local_ip, 0, sizeof(server.local_ip));
+          std::memset(&server.local, 0, sizeof(server.local));
         }
 
         // Read local port or set it to server value
         if (val.isMember("local_port"))
         {
-          server.local_port = val["local_port"].asInt();
+          server.local.sin_port = htons(val["local_port"].asInt());
         }
         else
         {
-          server.local_port = server.server_port;
+          server.local.sin_port = server.server.sin_port;
         }
 
         // Read multipliers or set it to 1
@@ -128,10 +132,10 @@ namespace Q3Pixy::Config
       for (const auto &a: config.servers)
       {
         out << "Entry " << ++cnt << ":" << std::endl;
-        inet_ntop(AF_INET, &(a.server_ip.sin_addr), str, INET_ADDRSTRLEN);
-        out << "Server: " << std::string(str) << ":" << a.server_port << std::endl;
-        inet_ntop(AF_INET, &(a.local_ip.sin_addr), str, INET_ADDRSTRLEN);
-        out << "Local: " << std::string(str) << ":" << a.local_port << std::endl;
+        inet_ntop(AF_INET, &(a.server.sin_addr), str, INET_ADDRSTRLEN);
+        out << "Server: " << std::string(str) << ":" << ntohs(a.server.sin_port) << std::endl;
+        inet_ntop(AF_INET, &(a.local.sin_addr), str, INET_ADDRSTRLEN);
+        out << "Local: " << std::string(str) << ":" << ntohs(a.local.sin_port) << std::endl;
         out << "Local -> Server multiplier: " << a.local_to_server_multiplier << std::endl;
         out << "Local -> Client multiplier: " << a.local_to_client_multiplier << std::endl;
         out << std::endl;

@@ -8,10 +8,8 @@ namespace Q3Pixy::Config
 {
   struct Server
   {
-    struct sockaddr_in server_ip;
-    uint16_t server_port;
-    struct sockaddr_in local_ip;
-    uint16_t local_port;
+    struct sockaddr_in server;
+    struct sockaddr_in local;
     uint32_t local_to_server_multiplier;
     uint32_t local_to_client_multiplier;
   };
