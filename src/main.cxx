@@ -4,16 +4,22 @@
 #include <iostream>
 #include <tuple>
 
-int
-main(void)
+int main(int argc, char* argv[])
 {
   bool load_config_success;
   std::string load_config_message;
   Q3Pixy::Config::Manager config_manager;
   Q3Pixy::Connections::Manager conn_manager;
 
+  if (argc != 2)
+  {
+    std::cout << "Usage:" << std::endl;
+    std::cout << "\tq3pixy /path/to/config.json" << std::endl;
+    return EXIT_FAILURE;
+  }
+
   // load config
-  std::tie(load_config_success, load_config_message) = config_manager.load_config("./q3pixy.json");
+  std::tie(load_config_success, load_config_message) = config_manager.load_config(argv[1]);
 
   if (!load_config_success)
   {
@@ -23,7 +29,7 @@ main(void)
 
 
 
-  std::cout << "Config loaded" << std::endl << std::endl;
+  std::cout << "Config " << argv[1] << " loaded" << std::endl << std::endl;
 
   config_manager.dump_config();
 
