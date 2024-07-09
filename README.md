@@ -7,7 +7,7 @@ q3pixy is UDP proxy designed for use with quake3 game. Main feature - duplicate 
 Install requirements:
 
 ```
-  sudo apt-get install libjsoncpp-dev
+  sudo apt-get install cmake libjsoncpp-dev
 ```
 
 build:

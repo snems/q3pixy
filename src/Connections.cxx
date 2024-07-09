@@ -64,7 +64,7 @@ namespace
 
 namespace std 
 {
-  template<> struct std::hash<SockKey>
+  template<> struct hash<SockKey>
   {
       std::size_t operator()(const SockKey& s) const noexcept
       {
@@ -259,6 +259,12 @@ namespace Q3Pixy::Connections
         if (client == clients_socks.end())
         {
           // if new client, create it
+          client = create_client(server->second, key);
+        }
+        else if (server->second != client->second->server)
+        {
+          // reconnect detected
+          teardown_client(client->second);
           client = create_client(server->second, key);
         }
 
