@@ -32,7 +32,7 @@ main(void)
 
   while(conn_manager.routine())
   {
-
+    conn_manager.kill_zombie();
   }
 
   return EXIT_SUCCESS;

@@ -1,5 +1,6 @@
 #include "include/Connections.hxx"
 #include "include/Config.hxx"
+#include <chrono>
 #include <cstdint>
 #include <cstring>
 #include <iostream>
@@ -102,6 +103,7 @@ namespace Q3Pixy::Connections
         {
           throw std::runtime_error("Couldn't bind locals to server socket");
         }
+        last_event = std::chrono::system_clock::now();
       }
 
       ClientConnecton(const ClientConnecton& other) = delete;
@@ -267,6 +269,8 @@ namespace Q3Pixy::Connections
         {
           throw std::runtime_error("Couldn't send datagram to server");
         }
+
+        client->second->last_event = std::chrono::system_clock::now();
       }
       else if ((client_from_fd = fd_to_servers.find(event.data.fd)) != fd_to_servers.end()) // is it from server
       {
@@ -359,7 +363,7 @@ namespace Q3Pixy::Connections
   {
     struct epoll_event pevents[1];
     const uint32_t size = sizeof(pevents)/sizeof(struct epoll_event);
-    int rc = epoll_wait( pimpl->pollfd, pevents, size, 10000 );
+    int rc = epoll_wait( pimpl->pollfd, pevents, size, 1000 );
     if (rc == -1)
     {
       return false;
@@ -378,6 +382,23 @@ namespace Q3Pixy::Connections
     }
 
     return true;
+  }
+
+  void Manager::kill_zombie()
+  {
+    auto now = std::chrono::system_clock::now();
+
+    for (auto s: pimpl->fd_to_clients)
+    {
+      for (auto it = s.second->clients.begin(); it != s.second->clients.end(); ++it)
+      {
+        if ((now - it->second->last_event)/std::chrono::seconds(1) >  dead_time_seconds)
+        {
+          pimpl->teardown_client(it->second);
+          break; // break, as map changed
+        }
+      }
+    }
   }
 }
 
