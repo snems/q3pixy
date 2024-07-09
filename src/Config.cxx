@@ -102,7 +102,7 @@ namespace Q3Pixy::Config
         // Read multipliers or set it to 1
         if (val.isMember("local_to_server_multiplier"))
         {
-          server.local_to_server_multiplier = val["local_to_server_multiplier"].asInt();
+          server.local_to_server_multiplier = std::min(val["local_to_server_multiplier"].asInt(), 8);
         }
         else
         {
@@ -110,7 +110,7 @@ namespace Q3Pixy::Config
         }
         if (val.isMember("local_to_client_multiplier"))
         {
-          server.local_to_client_multiplier = val["local_to_client_multiplier"].asInt();
+          server.local_to_client_multiplier = std::min(val["local_to_client_multiplier"].asInt(), 8);
         }
         else
         {

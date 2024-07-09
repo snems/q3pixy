@@ -11,6 +11,7 @@ main(void)
   std::string load_config_message;
   Q3Pixy::Config::Manager config_manager;
   Q3Pixy::Connections::Manager conn_manager;
+
   // load config
   std::tie(load_config_success, load_config_message) = config_manager.load_config("./q3pixy.json");
 
@@ -22,7 +23,8 @@ main(void)
 
 
 
-  std::cout << "Config loaded" << std::endl;
+  std::cout << "Config loaded" << std::endl << std::endl;
+
   config_manager.dump_config();
 
   conn_manager.init(config_manager.get_config());

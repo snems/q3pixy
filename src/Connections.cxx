@@ -264,10 +264,14 @@ namespace Q3Pixy::Connections
 
         // send datagram via client socket to the server
         const auto &server_sock = client->second->server->server_config.server;
-        auto send_len = sendto(client->second->fd_to_server, datagram, recv_len, 0, reinterpret_cast<const struct sockaddr*>(&server_sock), sizeof(server_sock));
-        if (send_len < 0)
+        ssize_t send_len;
+        for (int i = client->second->server->server_config.local_to_server_multiplier; i > 0; --i)
         {
-          throw std::runtime_error("Couldn't send datagram to server");
+          send_len = sendto(client->second->fd_to_server, datagram, recv_len, 0, reinterpret_cast<const struct sockaddr*>(&server_sock), sizeof(server_sock));
+          if (send_len < 0)
+          {
+            throw std::runtime_error("Couldn't send datagram to server");
+          }
         }
 
         client->second->last_event = std::chrono::system_clock::now();
@@ -275,13 +279,17 @@ namespace Q3Pixy::Connections
       else if ((client_from_fd = fd_to_servers.find(event.data.fd)) != fd_to_servers.end()) // is it from server
       {
         // find client and send data to it
-        auto send_len = sendto(client_from_fd->second->server->fd_to_client, datagram, recv_len, 
-            0, 
-            reinterpret_cast<const struct sockaddr*>(&client_from_fd->second->sock.sock), 
-            sizeof(client_from_fd->second->sock.sock));
-        if (send_len < 0)
+        ssize_t send_len;
+        for (int i = client_from_fd->second->server->server_config.local_to_client_multiplier; i > 0; --i)
         {
-          throw std::runtime_error("Couldn't send datagram to client");
+          send_len = sendto(client_from_fd->second->server->fd_to_client, datagram, recv_len, 
+              0, 
+              reinterpret_cast<const struct sockaddr*>(&client_from_fd->second->sock.sock), 
+              sizeof(client_from_fd->second->sock.sock));
+          if (send_len < 0)
+          {
+            throw std::runtime_error("Couldn't send datagram to client");
+          }
         }
       }
       else 
